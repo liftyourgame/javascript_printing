@@ -1,0 +1,73 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+
+  <!-- Add your site or application content here -->
+  <p>Hello world! This is HTML5 Boilerplate.</p>
+  <script src="js/vendor/modernizr-3.11.2.min.js"></script>
+  <script src="js/plugins.js"></script>
+  <script src="js/main.js"></script>
+
+  <script>
+    function triggerPrint() {
+      console.warn('in trigger print');
+      window.frames.printFrame.focus();
+      window.frames.printFrame.contentWindow.print();
+    }
+
+    function finishPrint() {
+      console.warn('in finish print');
+      let iframe = window.frames.printFrame;
+      if (iframe) {
+        console.warn('found iframe');
+        const parent = iframe.parentNode
+        if (parent) {
+          console.warn('has parent');
+          parent.removeChild(iframe);
+        }
+        iframe = null;
+      }
+    }
+
+    function printAction() {
+      console.warn('in print action');
+      const iframe = document.createElement('iframe');
+      iframe.id = 'printFrame';
+      iframe.name = 'print';
+      iframe.style.display = 'none';
+      iframe.removeAttribute('sandbox');
+      iframe.src="http://localhost:1234/printcontent.html";
+      document.body.appendChild(iframe);
+      // setTimeout(triggerPrint, 1000);
+      triggerPrint();
+      setTimeout(finishPrint, 10000);
+    }
+  </script>
+
+  <button onclick="printAction()">Print</button>
+
+</body>
+
+</html>
