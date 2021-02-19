@@ -31,6 +31,8 @@
   <script src="js/main.js"></script>
 
   <script>
+
+    let iframe = null;
     function triggerPrint() {
       console.warn('in trigger print');
       window.frames.printFrame.focus();
@@ -39,8 +41,9 @@
 
     function finishPrint() {
       console.warn('in finish print');
-      let iframe = window.frames.printFrame;
+      iframe = window.frames.printFrame;
       if (iframe) {
+        iframe.blur();
         console.warn('found iframe');
         const parent = iframe.parentNode
         if (parent) {
@@ -51,18 +54,47 @@
       }
     }
 
-    function printAction() {
-      console.warn('in print action');
-      const iframe = document.createElement('iframe');
+    function createFrame() {
+      iframe = document.createElement('iframe');
       iframe.id = 'printFrame';
-      iframe.name = 'print';
+      iframe.name = 'printX';
       iframe.style.display = 'none';
       iframe.removeAttribute('sandbox');
-      iframe.src="http://localhost:1234/printcontent.html";
+      iframe.src="/printcontent.html";
       document.body.appendChild(iframe);
+    }
+
+    function printAction() {
+      console.warn('in print action');
+
+      createFrame();
+
+      // Safari
+      if (!window.onafterprint) {
+        // emulate onbeforeprint/onafterprint events
+        const mediaQueryCallback = function (mql) {
+          console.warn('Media Query Matches: ', mql.matches);
+          if (!mql.matches && iframe) {
+            console.warn('Removing child print iframe');
+            document.body.removeChild(iframe);
+          }
+        };
+        const mediaQueryList = window.frames[iframe.name].matchMedia('print');
+        mediaQueryList.addListener(mediaQueryCallback);
+
+        // the code below will trigger a cleanup in case a user hits Cancel button
+        // in that Safari's new additional print confirmation dialog
+        window.frames[iframe.name].focus();
+        window.frames[iframe.name].onfocus = function () {
+          console.warn('In onfocus event');
+          return mediaQueryCallback(mediaQueryList);
+        };
+      }
+
       // setTimeout(triggerPrint, 1000);
-      triggerPrint();
-      setTimeout(finishPrint, 10000);
+      iframe.onload = triggerPrint;
+      // triggerPrint();
+      // setTimeout(finishPrint, 10000);
     }
   </script>
 
